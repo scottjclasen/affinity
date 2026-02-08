@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Affinity Campaign Prioritization Matrix</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #121a2a;
+      --card2: #0f1626;
+      --text: #e8eefc;
+      --muted: #a9b7d0;
+      --line: rgba(255,255,255,0.12);
+      --accent: #7aa2ff;
+      --warn: #ffcf5a;
+      --bad: #ff6b6b;
+      --good: #6bffb0;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 20% -10%, rgba(122,162,255,0.18), transparent 55%),
+                  radial-gradient(1200px 800px at 90% 10%, rgba(107,255,176,0.10), transparent 50%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.35;
+    }
+    header {
+      padding: 28px 18px 10px;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      letter-spacing: 0.2px;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0;
+    }
+
+    main { max-width: 1180px; margin: 0 auto; padding: 14px 18px 28px; display: grid; gap: 14px; }
+    .grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+    @media (min-width: 980px) {
+      .grid { grid-template-columns: 420px 1fr; }
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 65%), var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .card h2 {
+      font-size: 14px;
+      margin: 0 0 10px;
+      color: #dbe6ff;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    input, select, textarea, button {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--card2);
+      color: var(--text);
+      padding: 10px 10px;
+      font-size: 14px;
+      outline: none;
+    }
+    textarea { min-height: 68px; resize: vertical; }
+    input::placeholder, textarea::placeholder { color: rgba(169,183,208,0.55); }
+    input:focus, select:focus, textarea:focus { border-color: rgba(122,162,255,0.55); box-shadow: 0 0 0 3px rgba(122,162,255,0.12); }
+
+    .btnRow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    button { cursor: pointer; transition: transform 0.05s ease, border-color 0.2s ease; }
+    button:active { transform: translateY(1px); }
+    .primary { background: rgba(122,162,255,0.16); border-color: rgba(122,162,255,0.45); }
+    .ghost { background: transparent; }
+    .danger { background: rgba(255,107,107,0.12); border-color: rgba(255,107,107,0.45); }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.02);
+      color: var(--muted);
+      font-size: 12px;
+      margin: 6px 6px 0 0;
+    }
+    .pill strong { color: var(--text); font-weight: 600; }
+
+    .tableWrap { overflow: auto; border-radius: 14px; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    th, td { padding: 10px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { position: sticky; top: 0; background: #0e1526; color: #dbe6ff; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+    td { font-size: 13px; color: rgba(232,238,252,0.92); }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .num { text-align: right; white-space: nowrap; }
+    .small { font-size: 12px; color: var(--muted); }
+    .scoreBadge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      font-weight: 700;
+      background: rgba(255,255,255,0.02);
+    }
+    .scoreGood { border-color: rgba(107,255,176,0.35); background: rgba(107,255,176,0.08); }
+    .scoreWarn { border-color: rgba(255,207,90,0.35); background: rgba(255,207,90,0.08); }
+    .scoreBad { border-color: rgba(255,107,107,0.35); background: rgba(255,107,107,0.08); }
+
+    .mutedBlock {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.02);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    dialog {
+      width: min(720px, calc(100vw - 22px));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      padding: 0;
+    }
+    dialog::backdrop { background: rgba(0,0,0,0.6); }
+    .modalHead { padding: 14px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+    .modalHead h3 { margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.4px; color: #dbe6ff; }
+    .modalBody { padding: 14px; display: grid; gap: 12px; }
+    .q { padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,0.02); }
+    .qTitle { font-size: 13px; margin: 0 0 8px; color: rgba(232,238,252,0.95); }
+    .qOptions { display: grid; gap: 8px; }
+    .opt { display: flex; gap: 10px; align-items: flex-start; }
+    .opt input { width: auto; margin-top: 2px; }
+    .modalFoot { padding: 14px; border-top: 1px solid var(--line); display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+    .rightTop { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .weights { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .weights > div { width: 160px; }
+    .searchBar { width: 280px; max-width: 100%; }
+
+    .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Campaign Prioritization Scoring Matrix</h1>
+    <p class="sub">Enter campaigns, assign Impact (1–5) and Effort (1–5; 5 = low effort), and sort by weighted Priority Score.</p>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2>Add / Edit Campaign</h2>
+
+      <div class="row">
+        <div>
+          <label>Product</label>
+          <input id="product" placeholder="e.g., Affinity Insights" />
+        </div>
+        <div>
+          <label>Owner (optional)</label>
+          <input id="owner" placeholder="e.g., Robin" />
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label>Campaign / Strategy</label>
+        <input id="campaign" placeholder="Short name (e.g., Lawyerist webinar → consult CTA)" />
+      </div>
+
+      <div style="margin-top:10px;">
+        <label>Description (optional)</label>
+        <textarea id="desc" placeholder="Brief description, target audience, offer, channel mix…"></textarea>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Product Revenue Goal ($)</label>
+          <input id="goal" inputmode="decimal" placeholder="e.g., 500000" />
+          <div class="hint">Used for % of goal mapping if you enter an incremental revenue estimate.</div>
+        </div>
+        <div>
+          <label>Est. Incremental Revenue ($) (optional)</label>
+          <input id="incr" inputmode="decimal" placeholder="e.g., 90000" />
+          <div class="hint">If provided, the app can auto-suggest an Impact Score using % of goal.</div>
+        </div>
+      </div>
+
+      <div class="row3" style="margin-top:10px;">
+        <div>
+          <label>Impact Score (1–5)</label>
+          <select id="impact">
+            <option value="">(choose)</option>
+            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          </select>
+          <div class="hint">1 = negligible impact; 5 = very high impact.</div>
+        </div>
+        <div>
+          <label>Effort Score (1–5; 5=low effort)</label>
+          <select id="effort">
+            <option value="">(choose)</option>
+            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          </select>
+          <div class="hint">5 = XS / very low effort; 1 = XL / very high effort.</div>
+        </div>
+        <div>
+          <label>Target Launch (optional)</label>
+          <input id="launch" type="date" />
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label>Dependencies / Notes (optional)</label>
+        <input id="deps" placeholder="Approvals, cross-functional needs, risks, low-confidence notes…" />
+      </div>
+
+      <div class="btnRow">
+        <button class="primary" id="saveBtn">Add campaign</button>
+        <button class="ghost" id="quizBtn" type="button">Use quiz to score</button>
+        <button class="ghost" id="autoImpactBtn" type="button">Auto-suggest Impact from % of goal</button>
+        <button class="danger" id="resetFormBtn" type="button">Clear form</button>
+      </div>
+
+      <div style="margin-top:10px;" class="mutedBlock">
+        <div><strong>Default weights:</strong> Impact 60% / Effort 40%. You can change this on the right.</div>
+        <div class="small" style="margin-top:6px;">
+          Priority Score = (Impact × Impact Weight) + (Effort × Effort Weight). Higher = higher priority.
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <span class="pill"><strong>Impact % mapping:</strong> &lt;2%=1 • 2–5%=2 • 5–10%=3 • 10–20%=4 • &gt;20%=5</span>
+        <span class="pill"><strong>Effort crosswalk:</strong> XS=5 • S=4 • M=3 • L=2 • XL=1</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="rightTop">
+        <div class="weights">
+          <div>
+            <label>Impact Weight</label>
+            <input id="wImpact" inputmode="decimal" value="0.6" />
+          </div>
+          <div>
+            <label>Effort Weight</label>
+            <input id="wEffort" inputmode="decimal" value="0.4" />
+          </div>
+          <div style="width: 220px;">
+            <label>Weight Presets</label>
+            <select id="preset">
+              <option value="0.6,0.4">Default (0.6 / 0.4)</option>
+              <option value="0.7,0.3">Aggressive (0.7 / 0.3)</option>
+              <option value="0.5,0.5">Balanced (0.5 / 0.5)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="searchBar">
+          <label>Search</label>
+          <input id="search" placeholder="Filter by product, campaign, owner…" />
+        </div>
+      </div>
+
+      <div class="btnRow" style="margin-top:0;">
+        <button class="ghost" id="exportBtn" type="button">Export CSV</button>
+        <button class="ghost" id="loadSamplesBtn" type="button">Load sample rows</button>
+        <button class="danger" id="clearAllBtn" type="button">Clear all data</button>
+      </div>
+
+      <div class="tableWrap" style="margin-top:12px;">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th style="min-width:160px;">Product</th>
+              <th style="min-width:260px;">Campaign</th>
+              <th style="min-width:230px;">Description / Notes</th>
+              <th class="num" style="min-width:140px;">Goal ($)</th>
+              <th class="num" style="min-width:170px;">Incremental ($)</th>
+              <th class="num" style="min-width:120px;">% of Goal</th>
+              <th class="num" style="min-width:120px;">Impact</th>
+              <th class="num" style="min-width:120px;">Effort</th>
+              <th class="num" style="min-width:140px;">Priority</th>
+              <th style="min-width:120px;">Owner</th>
+              <th style="min-width:130px;">Launch</th>
+              <th style="min-width:190px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="mutedBlock" style="margin-top:12px;">
+        <div><strong>Tie-breakers:</strong> If Priority is equal, sort by higher Impact Score, then earlier Launch date (if filled), then lower incremental cash cost (if meaningful).</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Quiz modal -->
+  <dialog id="quiz">
+    <div class="modalHead">
+      <h3>Prioritization Quiz</h3>
+      <button class="ghost" id="closeQuizBtn" type="button" style="width:auto; padding:8px 10px;">Close</button>
+    </div>
+    <div class="modalBody">
+      <div class="mutedBlock">
+        Answer each question once. The quiz assigns <strong>Impact Score (1–5)</strong> and <strong>Effort Score (1–5; 5 = low effort)</strong>.
+      </div>
+
+      <div class="q">
+        <p class="qTitle">1) Target segment value</p>
+        <div class="qOptions" data-q="i1">
+          <label class="opt"><input type="radio" name="i1" value="2"> Top revenue segment / expansion-ready accounts</label>
+          <label class="opt"><input type="radio" name="i1" value="1"> Mixed/value uncertain</label>
+          <label class="opt"><input type="radio" name="i1" value="0"> Low-value / exploratory</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="qTitle">2) Projected reach (this quarter)</p>
+        <div class="qOptions" data-q="i2">
+          <label class="opt"><input type="radio" name="i2" value="2"> &gt;20% of addressable audience</label>
+          <label class="opt"><input type="radio" name="i2" value="1"> 10–20%</label>
+          <label class="opt"><input type="radio" name="i2" value="0"> &lt;10%</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="qTitle">3) Expected conversion strength</p>
+        <div class="qOptions" data-q="i3">
+          <label class="opt"><input type="radio" name="i3" value="2"> High intent / proven CTA (demo, consult, trial)</label>
+          <label class="opt"><input type="radio" name="i3" value="1"> Mid intent (webinar/guide + nurture)</label>
+          <label class="opt"><input type="radio" name="i3" value="0"> Low intent (awareness only)</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="qTitle">4) Historical analog / confidence</p>
+        <div class="qOptions" data-q="i4">
+          <label class="opt"><input type="radio" name="i4" value="2"> Strong analog (we’ve done this successfully)</label>
+          <label class="opt"><input type="radio" name="i4" value="1"> Partial analog / mixed results</label>
+          <label class="opt"><input type="radio" name="i4" value="0"> New/unproven</label>
+        </div>
+      </div>
+
+      <hr style="border:0; border-top:1px solid var(--line); width:100%;">
+
+      <div class="q">
+        <p class="qTitle">5) Net-new assets/channels required</p>
+        <div class="qOptions" data-q="e1">
+          <label class="opt"><input type="radio" name="e1" value="2"> Reuse existing assets; 1 channel</label>
+          <label class="opt"><input type="radio" name="e1" value="1"> Some new creative; 2–3 channels</label>
+          <label class="opt"><input type="radio" name="e1" value="0"> Many net-new assets; 4+ channels</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="qTitle">6) Cross-functional dependencies</p>
+        <div class="qOptions" data-q="e2">
+          <label class="opt"><input type="radio" name="e2" value="2"> None/one team</label>
+          <label class="opt"><input type="radio" name="e2" value="1"> 2–3 teams</label>
+          <label class="opt"><input type="radio" name="e2" value="0"> 4+ teams or external vendor</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="qTitle">7) Approvals/compliance/technical complexity</p>
+        <div class="qOptions" data-q="e3">
+          <label class="opt"><input type="radio" name="e3" value="2"> Routine approvals; no integration</label>
+          <label class="opt"><input type="radio" name="e3" value="1"> Some reviews or light integration</label>
+          <label class="opt"><input type="radio" name="e3" value="0"> Heavy compliance or meaningful integration/workflow change</label>
+        </div>
+      </div>
+
+      <div class="mutedBlock" id="quizPreview">
+        <div><strong>Preview:</strong> Answer questions to see the mapped scores.</div>
+      </div>
+    </div>
+
+    <div class="modalFoot">
+      <button class="ghost" id="quizResetBtn" type="button" style="width:auto;">Reset quiz</button>
+      <button class="primary" id="quizApplyBtn" type="button" style="width:auto;">Apply scores to form</button>
+    </div>
+  </dialog>
+
+  <script>
+    // ---------- Helpers ----------
+    const $ = (id) => document.getElementById(id);
+
+    function toNumber(val) {
+      if (val === null || val === undefined) return null;
+      const cleaned = String(val).replace(/[$, ]/g, "").trim();
+      if (cleaned === "") return null;
+      const n = Number(cleaned);
+      return Number.isFinite(n) ? n : null;
+    }
+    function fmtMoney(n) {
+      if (n === null || n === undefined || !Number.isFinite(n)) return "";
+      return n.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    }
+    function fmtPct(n) {
+      if (n === null || n === undefined || !Number.isFinite(n)) return "";
+      return (n * 100).toFixed(1) + "%";
+    }
+    function clampInt(n, min, max) {
+      n = Math.round(Number(n));
+      if (!Number.isFinite(n)) return null;
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function impactFromPct(p) {
+      // p in fraction (0.18 == 18%)
+      if (p === null || !Number.isFinite(p)) return null;
+      const pct = p * 100;
+      if (pct < 2) return 1;
+      if (pct < 5) return 2;
+      if (pct < 10) return 3;
+      if (pct < 20) return 4;
+      return 5;
+    }
+
+    function badge(score) {
+      const s = Number(score);
+      if (!Number.isFinite(s)) return `<span class="scoreBadge">–</span>`;
+      let cls = "scoreWarn";
+      if (s >= 4) cls = "scoreGood";
+      if (s <= 2) cls = "scoreBad";
+      return `<span class="scoreBadge ${cls}">${s}</span>`;
+    }
+
+    function safeDate(d) {
+      // Return YYYY-MM-DD or ""
+      if (!d) return "";
+      const s = String(d).trim();
+      return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : "";
+    }
+
+    // ---------- State ----------
+    const STORAGE_KEY = "affinity_campaign_priority_v1";
+    let campaigns = [];
+    let editingId = null;
+
+    function saveState() {
+      const weights = {
+        wImpact: toNumber($("wImpact").value) ?? 0.6,
+        wEffort: toNumber($("wEffort").value) ?? 0.4
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ campaigns, weights }));
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        campaigns = Array.isArray(parsed.campaigns) ? parsed.campaigns : [];
+        if (parsed.weights) {
+          $("wImpact").value = (parsed.weights.wImpact ?? 0.6);
+          $("wEffort").value = (parsed.weights.wEffort ?? 0.4);
+        }
+      } catch (e) {
+        console.warn("Failed to load saved state:", e);
+      }
+    }
+
+    function getWeights() {
+      let wi = toNumber($("wImpact").value);
+      let we = toNumber($("wEffort").value);
+      // Defaults if blank
+      if (wi === null) wi = 0.6;
+      if (we === null) we = 0.4;
+
+      // Normalize if user enters values that don't sum to 1
+      const sum = wi + we;
+      if (sum > 0 && Math.abs(sum - 1) > 0.001) {
+        wi = wi / sum;
+        we = we / sum;
+        $("wImpact").value = wi.toFixed(3);
+        $("wEffort").value = we.toFixed(3);
+      }
+      return { wi, we };
+    }
+
+    function computePriority(impactScore, effortScore) {
+      const { wi, we } = getWeights();
+      const i = toNumber(impactScore);
+      const e = toNumber(effortScore);
+      if (i === null || e === null) return null;
+      return (i * wi) + (e * we);
+    }
+
+    function percentOfGoal(goal, incr) {
+      if (!Number.isFinite(goal) || goal <= 0) return null;
+      if (!Number.isFinite(incr)) return null;
+      return incr / goal;
+    }
+
+    // ---------- CRUD ----------
+    function resetForm() {
+      editingId = null;
+      $("product").value = "";
+      $("owner").value = "";
+      $("campaign").value = "";
+      $("desc").value = "";
+      $("goal").value = "";
+      $("incr").value = "";
+      $("impact").value = "";
+      $("effort").value = "";
+      $("launch").value = "";
+      $("deps").value = "";
+      $("saveBtn").textContent = "Add campaign";
+    }
+
+    function fillForm(item) {
+      editingId = item.id;
+      $("product").value = item.product ?? "";
+      $("owner").value = item.owner ?? "";
+      $("campaign").value = item.campaign ?? "";
+      $("desc").value = item.desc ?? "";
+      $("goal").value = item.goal ?? "";
+      $("incr").value = item.incr ?? "";
+      $("impact").value = item.impact ?? "";
+      $("effort").value = item.effort ?? "";
+      $("launch").value = safeDate(item.launch);
+      $("deps").value = item.deps ?? "";
+      $("saveBtn").textContent = "Save changes";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function upsertFromForm() {
+      const product = $("product").value.trim();
+      const campaign = $("campaign").value.trim();
+      if (!product || !campaign) {
+        alert("Please enter at least Product and Campaign.");
+        return;
+      }
+
+      const goal = toNumber($("goal").value);
+      const incr = toNumber($("incr").value);
+      const impact = clampInt($("impact").value, 1, 5);
+      const effort = clampInt($("effort").value, 1, 5);
+
+      const item = {
+        id: editingId ?? crypto.randomUUID(),
+        product,
+        campaign,
+        desc: $("desc").value.trim(),
+        goal: goal ?? null,
+        incr: incr ?? null,
+        impact: impact ?? null,
+        effort: effort ?? null,
+        owner: $("owner").value.trim(),
+        launch: safeDate($("launch").value),
+        deps: $("deps").value.trim(),
+        createdAt: Date.now()
+      };
+
+      if (editingId) {
+        campaigns = campaigns.map(c => c.id === editingId ? item : c);
+      } else {
+        campaigns.push(item);
+      }
+
+      saveState();
+      render();
+      resetForm();
+    }
+
+    function removeById(id) {
+      campaigns = campaigns.filter(c => c.id !== id);
+      saveState();
+      render();
+    }
+
+    // ---------- Render ----------
+    function render() {
+      const tbody = $("tbl").querySelector("tbody");
+      tbody.innerHTML = "";
+
+      const query = $("search").value.trim().toLowerCase();
+
+      const computed = campaigns.map(c => {
+        const goal = toNumber(c.goal);
+        const incr = toNumber(c.incr);
+        const pct = percentOfGoal(goal, incr);
+        const priority = computePriority(c.impact, c.effort);
+        return { ...c, _goalN: goal, _incrN: incr, _pct: pct, _priority: priority };
+      });
+
+      const filtered = computed.filter(c => {
+        if (!query) return true;
+        const blob = [
+          c.product, c.campaign, c.desc, c.owner, c.deps
+        ].join(" ").toLowerCase();
+        return blob.includes(query);
+      });
+
+      // Sort: priority desc, then impact desc, then launch asc (if present)
+      filtered.sort((a,b) => {
+        const ap = a._priority ?? -Infinity;
+        const bp = b._priority ?? -Infinity;
+        if (bp !== ap) return bp - ap;
+
+        const ai = toNumber(a.impact) ?? -Infinity;
+        const bi = toNumber(b.impact) ?? -Infinity;
+        if (bi !== ai) return bi - ai;
+
+        const ad = a.launch ? Date.parse(a.launch) : Infinity;
+        const bd = b.launch ? Date.parse(b.launch) : Infinity;
+        return ad - bd;
+      });
+
+      for (const c of filtered) {
+        const descBlock = [c.desc, c.deps].filter(Boolean).join(" — ");
+        const pctTxt = c._pct === null ? "" : fmtPct(c._pct);
+        const prTxt = c._priority === null ? "" : c._priority.toFixed(2);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(c.product)}</td>
+          <td>
+            <div style="font-weight:650;">${escapeHtml(c.campaign)}</div>
+            <div class="small">${escapeHtml(c.deps || "")}</div>
+          </td>
+          <td class="small">${escapeHtml(descBlock || "")}</td>
+          <td class="num">${c._goalN === null ? "" : fmtMoney(c._goalN)}</td>
+          <td class="num">${c._incrN === null ? "" : fmtMoney(c._incrN)}</td>
+          <td class="num">${pctTxt}</td>
+          <td class="num">${badge(c.impact)}</td>
+          <td class="num">${badge(c.effort)}</td>
+          <td class="num"><strong>${escapeHtml(prTxt)}</strong></td>
+          <td>${escapeHtml(c.owner || "")}</td>
+          <td>${escapeHtml(c.launch || "")}</td>
+          <td>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="ghost" data-act="edit" data-id="${c.id}" style="width:auto; padding:8px 10px;">Edit</button>
+              <button class="ghost" data-act="suggest" data-id="${c.id}" style="width:auto; padding:8px 10px;">Suggest Impact</button>
+              <button class="danger" data-act="del" data-id="${c.id}" style="width:auto; padding:8px 10px;">Delete</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      // wire table actions
+      tbody.querySelectorAll("button[data-act]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const act = btn.getAttribute("data-act");
+          const id = btn.getAttribute("data-id");
+          const item = campaigns.find(x => x.id === id);
+          if (!item) return;
+          if (act === "edit") fillForm(item);
+          if (act === "del") {
+            if (confirm("Delete this campaign?")) removeById(id);
+          }
+          if (act === "suggest") {
+            const goal = toNumber(item.goal);
+            const incr = toNumber(item.incr);
+            const pct = percentOfGoal(goal, incr);
+            const sug = impactFromPct(pct);
+            if (sug === null) {
+              alert("To auto-suggest Impact, enter both Revenue Goal and Est. Incremental Revenue.");
+              return;
+            }
+            item.impact = sug;
+            campaigns = campaigns.map(c => c.id === id ? item : c);
+            saveState();
+            render();
+          }
+        });
+      });
+
+      saveState();
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // ---------- CSV Export ----------
+    function exportCSV() {
+      const { wi, we } = getWeights();
+
+      const header = [
+        "Product",
+        "Campaign",
+        "Revenue Goal ($)",
+        "Est. Incremental Revenue ($ or % of Goal)",
+        "Impact Score (1–5)",
+        "Effort Score (1–5; 5=low effort)",
+        "Impact Weight",
+        "Effort Weight",
+        "Priority Score",
+        "Owner",
+        "Target Launch",
+        "Dependencies/Notes"
+      ];
+
+      const rows = campaigns.map(c => {
+        const goal = toNumber(c.goal);
+        const incr = toNumber(c.incr);
+        const pct = percentOfGoal(goal, incr);
+        const incrCell = (incr !== null && goal !== null)
+          ? `${incr} (${(pct*100).toFixed(1)}% of goal)`
+          : (incr !== null ? String(incr) : "");
+        const priority = computePriority(c.impact, c.effort);
+        return [
+          c.product ?? "",
+          c.campaign ?? "",
+          goal ?? "",
+          incrCell,
+          c.impact ?? "",
+          c.effort ?? "",
+          wi,
+          we,
+          priority === null ? "" : priority.toFixed(2),
+          c.owner ?? "",
+          c.launch ?? "",
+          [c.desc, c.deps].filter(Boolean).join(" — ")
+        ];
+      });
+
+      const csv = [header, ...rows].map(r => r.map(cell => {
+        const s = String(cell ?? "");
+        if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+          return `"${s.replaceAll('"', '""')}"`;
+        }
+        return s;
+      }).join(",")).join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "campaign-prioritization.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // ---------- Quiz logic ----------
+    function quizScorePreview() {
+      const impactPoints = sumChecked(["i1","i2","i3","i4"]);
+      const effortPoints = sumChecked(["e1","e2","e3"]);
+
+      const impactScore = mapImpactPoints(impactPoints);
+      const effortScore = mapEffortPoints(effortPoints);
+
+      const preview = $("quizPreview");
+      preview.innerHTML = `
+        <div><strong>Impact points:</strong> ${impactPoints} → <strong>Impact Score:</strong> ${impactScore ?? "—"}</div>
+        <div style="margin-top:6px;"><strong>Effort points:</strong> ${effortPoints} → <strong>Effort Score:</strong> ${effortScore ?? "—"} <span class="small">(5 = low effort)</span></div>
+      `;
+    }
+
+    function sumChecked(names) {
+      let sum = 0;
+      let any = false;
+      for (const name of names) {
+        const el = document.querySelector(`input[name="${name}"]:checked`);
+        if (el) { sum += Number(el.value); any = true; }
+      }
+      return any ? sum : 0;
+    }
+
+    function mapImpactPoints(p) {
+      // With 4 questions, max is 8. We keep mapping consistent by scaling to 10.
+      // Scale: p * (10/8)
+      const scaled = p * 1.25;
+      if (scaled <= 2) return 1;
+      if (scaled <= 4) return 2;
+      if (scaled <= 6) return 3;
+      if (scaled <= 8) return 4;
+      return 5;
+    }
+
+    function mapEffortPoints(p) {
+      // 3 questions, max 6. Scale to 10.
+      const scaled = p * (10/6);
+      if (scaled <= 1) return 1;
+      if (scaled <= 3) return 2;
+      if (scaled <= 5) return 3;
+      if (scaled <= 7) return 4;
+      return 5;
+    }
+
+    function resetQuiz() {
+      document.querySelectorAll('#quiz input[type="radio"]').forEach(r => r.checked = false);
+      $("quizPreview").innerHTML = `<div><strong>Preview:</strong> Answer questions to see the mapped scores.</div>`;
+    }
+
+    function applyQuizToForm() {
+      const impactPoints = sumChecked(["i1","i2","i3","i4"]);
+      const effortPoints = sumChecked(["e1","e2","e3"]);
+      const impactScore = mapImpactPoints(impactPoints);
+      const effortScore = mapEffortPoints(effortPoints);
+
+      $("impact").value = String(impactScore);
+      $("effort").value = String(effortScore);
+      $("quiz").close();
+    }
+
+    // ---------- Buttons ----------
+    $("saveBtn").addEventListener("click", upsertFromForm);
+    $("resetFormBtn").addEventListener("click", resetForm);
+
+    $("preset").addEventListener("change", () => {
+      const [wi, we] = $("preset").value.split(",").map(Number);
+      $("wImpact").value = wi;
+      $("wEffort").value = we;
+      saveState();
+      render();
+    });
+
+    $("wImpact").addEventListener("change", () => { saveState(); render(); });
+    $("wEffort").addEventListener("change", () => { saveState(); render(); });
+    $("search").addEventListener("input", render);
+
+    $("exportBtn").addEventListener("click", exportCSV);
+
+    $("clearAllBtn").addEventListener("click", () => {
+      if (!confirm("Clear all saved campaigns and reset?")) return;
+      campaigns = [];
+      resetForm();
+      saveState();
+      render();
+    });
+
+    $("loadSamplesBtn").addEventListener("click", () => {
+      const samples = [
+        {
+          id: crypto.randomUUID(),
+          product: "Affinity Insights",
+          campaign: "Lawyerist audience: webinar → consult CTA (high impact / high effort)",
+          desc: "Partner webinar + consult request CTA; targets high-value segment; measurable pipeline expectation.",
+          goal: 500000,
+          incr: 90000,
+          impact: 4,
+          effort: 2,
+          owner: "Robin",
+          launch: "2026-03-15",
+          deps: "Needs speaker scheduling + landing page updates",
+          createdAt: Date.now()
+        },
+        {
+          id: crypto.randomUUID(),
+          product: "Affinity Labs",
+          campaign: "Insights-only customer drip to cross-sell Labs (medium impact / low effort)",
+          desc: "Email sequence using existing content + segmentation; triggers based on video consumption.",
+          goal: 300000,
+          incr: 24000,
+          impact: 3,
+          effort: 5,
+          owner: "Debbie",
+          launch: "2026-02-28",
+          deps: "Uses existing email templates; light segmentation work",
+          createdAt: Date.now()
+        }
+      ];
+      campaigns = [...samples, ...campaigns];
+      saveState();
+      render();
+    });
+
+    $("autoImpactBtn").addEventListener("click", () => {
+      const goal = toNumber($("goal").value);
+      const incr = toNumber($("incr").value);
+      const pct = percentOfGoal(goal, incr);
+      const sug = impactFromPct(pct);
+      if (sug === null) {
+        alert("Enter both Revenue Goal and Est. Incremental Revenue to auto-suggest Impact.");
+        return;
+      }
+      $("impact").value = String(sug);
+      alert(`Suggested Impact Score: ${sug} (based on ${(pct*100).toFixed(1)}% of goal)`);
+    });
+
+    // Quiz modal
+    $("quizBtn").addEventListener("click", () => $("quiz").showModal());
+    $("closeQuizBtn").addEventListener("click", () => $("quiz").close());
+    $("quizResetBtn").addEventListener("click", resetQuiz);
+    $("quizApplyBtn").addEventListener("click", applyQuizToForm);
+    document.querySelectorAll('#quiz input[type="radio"]').forEach(r => {
+      r.addEventListener("change", quizScorePreview);
+    });
+
+    // ---------- Init ----------
+    loadState();
+    render();
+  </script>
+</body>
+</html>
