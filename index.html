@@ -12,10 +12,6 @@
       --text: #e8eefc;
       --muted: #a9b7d0;
       --line: rgba(255,255,255,0.12);
-      --accent: #7aa2ff;
-      --warn: #ffcf5a;
-      --bad: #ff6b6b;
-      --good: #6bffb0;
       --shadow: 0 10px 30px rgba(0,0,0,0.35);
       --radius: 16px;
     }
@@ -30,42 +26,52 @@
       line-height: 1.35;
     }
     header {
-      padding: 28px 18px 10px;
-      max-width: 1180px;
+      padding: 24px 16px 10px;
+      max-width: 1200px;
       margin: 0 auto;
     }
-    h1 {
-      margin: 0 0 6px;
-      font-size: 24px;
-      letter-spacing: 0.2px;
-    }
-    .sub {
-      color: var(--muted);
-      font-size: 14px;
-      margin: 0;
-    }
+    h1 { margin: 0 0 6px; font-size: clamp(18px, 2.2vw, 26px); letter-spacing: 0.2px; }
+    .sub { color: var(--muted); font-size: 14px; margin: 0; }
 
-    main { max-width: 1180px; margin: 0 auto; padding: 14px 18px 28px; display: grid; gap: 14px; }
-    .grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
-    @media (min-width: 980px) {
+    main { max-width: 1200px; margin: 0 auto; padding: 12px 16px 26px; display: grid; gap: 14px; }
+
+    /* Responsive grid: single column on small screens; two columns on wider */
+    .grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 800px) {
+      .grid { grid-template-columns: 380px 1fr; }
+    }
+    @media (min-width: 1200px) {
       .grid { grid-template-columns: 420px 1fr; }
     }
+
     .card {
       background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 65%), var(--card);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding: 14px;
+      min-width: 0; /* important for responsive overflow handling */
     }
     .card h2 {
-      font-size: 14px;
+      font-size: 13px;
       margin: 0 0 10px;
       color: #dbe6ff;
       letter-spacing: 0.4px;
       text-transform: uppercase;
     }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+    /* Form rows become 2/3 cols on wide screens, stack on small */
+    .row { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .row3 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 520px) {
+      .row { grid-template-columns: 1fr 1fr; }
+      .row3 { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
     label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
     input, select, textarea, button {
       width: 100%;
@@ -87,6 +93,7 @@
     .primary { background: rgba(122,162,255,0.16); border-color: rgba(122,162,255,0.45); }
     .ghost { background: transparent; }
     .danger { background: rgba(255,107,107,0.12); border-color: rgba(255,107,107,0.45); }
+
     .pill {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 8px 10px;
@@ -99,15 +106,56 @@
     }
     .pill strong { color: var(--text); font-weight: 600; }
 
-    .tableWrap { overflow: auto; border-radius: 14px; border: 1px solid var(--line); }
-    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    .mutedBlock {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.02);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .small { font-size: 12px; color: var(--muted); }
+    .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+    /* Top controls should wrap nicely */
+    .rightTop {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .weights { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .weights > div { width: 160px; }
+    .searchBar { width: 280px; max-width: 100%; }
+
+    @media (max-width: 700px) {
+      .rightTop { flex-direction: column; align-items: stretch; }
+      .weights { width: 100%; }
+      .weights > div { width: 100%; }
+      .searchBar { width: 100%; }
+    }
+
+    /* Table wrapper: allow horizontal scroll if needed on mid screens */
+    .tableWrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; }
     th, td { padding: 10px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    th { position: sticky; top: 0; background: #0e1526; color: #dbe6ff; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+    th {
+      position: sticky;
+      top: 0;
+      background: #0e1526;
+      color: #dbe6ff;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
     td { font-size: 13px; color: rgba(232,238,252,0.92); }
     tr:hover td { background: rgba(255,255,255,0.02); }
 
     .num { text-align: right; white-space: nowrap; }
-    .small { font-size: 12px; color: var(--muted); }
+
     .scoreBadge {
       display: inline-flex;
       align-items: center;
@@ -121,17 +169,46 @@
     }
     .scoreGood { border-color: rgba(107,255,176,0.35); background: rgba(107,255,176,0.08); }
     .scoreWarn { border-color: rgba(255,207,90,0.35); background: rgba(255,207,90,0.08); }
-    .scoreBad { border-color: rgba(255,107,107,0.35); background: rgba(255,107,107,0.08); }
+    .scoreBad  { border-color: rgba(255,107,107,0.35); background: rgba(255,107,107,0.08); }
 
-    .mutedBlock {
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px dashed rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.02);
-      color: var(--muted);
-      font-size: 13px;
+    /* Mobile: table becomes cards */
+    @media (max-width: 900px) {
+      table, thead, tbody, th, tr, td { display: block; width: 100%; }
+      thead { display: none; }
+
+      tr {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        margin: 10px;
+        padding: 10px;
+        background: rgba(255,255,255,0.02);
+      }
+
+      td {
+        border: none;
+        padding: 6px 0;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--muted);
+        flex: 1;
+        text-align: left;
+      }
+
+      td > * {
+        flex: 1;
+        text-align: right;
+      }
+
+      .num { text-align: right; white-space: normal; }
     }
 
+    /* Modal */
     dialog {
       width: min(720px, calc(100vw - 22px));
       border: 1px solid var(--line);
@@ -151,13 +228,6 @@
     .opt { display: flex; gap: 10px; align-items: flex-start; }
     .opt input { width: auto; margin-top: 2px; }
     .modalFoot { padding: 14px; border-top: 1px solid var(--line); display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
-
-    .rightTop { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .weights { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .weights > div { width: 160px; }
-    .searchBar { width: 280px; max-width: 100%; }
-
-    .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -167,6 +237,7 @@
   </header>
 
   <main class="grid">
+    <!-- Left: Form -->
     <section class="card">
       <h2>Add / Edit Campaign</h2>
 
@@ -240,7 +311,7 @@
       </div>
 
       <div style="margin-top:10px;" class="mutedBlock">
-        <div><strong>Default weights:</strong> Impact 60% / Effort 40%. You can change this on the right.</div>
+        <div><strong>Default weights:</strong> Impact 60% / Effort 40%.</div>
         <div class="small" style="margin-top:6px;">
           Priority Score = (Impact × Impact Weight) + (Effort × Effort Weight). Higher = higher priority.
         </div>
@@ -252,6 +323,7 @@
       </div>
     </section>
 
+    <!-- Right: Table -->
     <section class="card">
       <div class="rightTop">
         <div class="weights">
@@ -289,18 +361,18 @@
         <table id="tbl">
           <thead>
             <tr>
-              <th style="min-width:160px;">Product</th>
-              <th style="min-width:260px;">Campaign</th>
-              <th style="min-width:230px;">Description / Notes</th>
-              <th class="num" style="min-width:140px;">Goal ($)</th>
-              <th class="num" style="min-width:170px;">Incremental ($)</th>
-              <th class="num" style="min-width:120px;">% of Goal</th>
-              <th class="num" style="min-width:120px;">Impact</th>
-              <th class="num" style="min-width:120px;">Effort</th>
-              <th class="num" style="min-width:140px;">Priority</th>
-              <th style="min-width:120px;">Owner</th>
-              <th style="min-width:130px;">Launch</th>
-              <th style="min-width:190px;">Actions</th>
+              <th>Product</th>
+              <th>Campaign</th>
+              <th>Description / Notes</th>
+              <th class="num">Goal ($)</th>
+              <th class="num">Incremental ($)</th>
+              <th class="num">% of Goal</th>
+              <th class="num">Impact</th>
+              <th class="num">Effort</th>
+              <th class="num">Priority</th>
+              <th>Owner</th>
+              <th>Launch</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -308,7 +380,7 @@
       </div>
 
       <div class="mutedBlock" style="margin-top:12px;">
-        <div><strong>Tie-breakers:</strong> If Priority is equal, sort by higher Impact Score, then earlier Launch date (if filled), then lower incremental cash cost (if meaningful).</div>
+        <div><strong>Tie-breakers:</strong> If Priority is equal, sort by higher Impact Score, then earlier Launch date (if filled), then lower cash cost.</div>
       </div>
     </section>
   </main>
@@ -326,7 +398,7 @@
 
       <div class="q">
         <p class="qTitle">1) Target segment value</p>
-        <div class="qOptions" data-q="i1">
+        <div class="qOptions">
           <label class="opt"><input type="radio" name="i1" value="2"> Top revenue segment / expansion-ready accounts</label>
           <label class="opt"><input type="radio" name="i1" value="1"> Mixed/value uncertain</label>
           <label class="opt"><input type="radio" name="i1" value="0"> Low-value / exploratory</label>
@@ -335,7 +407,7 @@
 
       <div class="q">
         <p class="qTitle">2) Projected reach (this quarter)</p>
-        <div class="qOptions" data-q="i2">
+        <div class="qOptions">
           <label class="opt"><input type="radio" name="i2" value="2"> &gt;20% of addressable audience</label>
           <label class="opt"><input type="radio" name="i2" value="1"> 10–20%</label>
           <label class="opt"><input type="radio" name="i2" value="0"> &lt;10%</label>
@@ -344,7 +416,7 @@
 
       <div class="q">
         <p class="qTitle">3) Expected conversion strength</p>
-        <div class="qOptions" data-q="i3">
+        <div class="qOptions">
           <label class="opt"><input type="radio" name="i3" value="2"> High intent / proven CTA (demo, consult, trial)</label>
           <label class="opt"><input type="radio" name="i3" value="1"> Mid intent (webinar/guide + nurture)</label>
           <label class="opt"><input type="radio" name="i3" value="0"> Low intent (awareness only)</label>
@@ -353,7 +425,7 @@
 
       <div class="q">
         <p class="qTitle">4) Historical analog / confidence</p>
-        <div class="qOptions" data-q="i4">
+        <div class="qOptions">
           <label class="opt"><input type="radio" name="i4" value="2"> Strong analog (we’ve done this successfully)</label>
           <label class="opt"><input type="radio" name="i4" value="1"> Partial analog / mixed results</label>
           <label class="opt"><input type="radio" name="i4" value="0"> New/unproven</label>
@@ -364,7 +436,7 @@
 
       <div class="q">
         <p class="qTitle">5) Net-new assets/channels required</p>
-        <div class="qOptions" data-q="e1">
+        <div class="qOptions">
           <label class="opt"><input type="radio" name="e1" value="2"> Reuse existing assets; 1 channel</label>
           <label class="opt"><input type="radio" name="e1" value="1"> Some new creative; 2–3 channels</label>
           <label class="opt"><input type="radio" name="e1" value="0"> Many net-new assets; 4+ channels</label>
@@ -373,7 +445,7 @@
 
       <div class="q">
         <p class="qTitle">6) Cross-functional dependencies</p>
-        <div class="qOptions" data-q="e2">
+        <div class="qOptions">
           <label class="opt"><input type="radio" name="e2" value="2"> None/one team</label>
           <label class="opt"><input type="radio" name="e2" value="1"> 2–3 teams</label>
           <label class="opt"><input type="radio" name="e2" value="0"> 4+ teams or external vendor</label>
@@ -382,7 +454,7 @@
 
       <div class="q">
         <p class="qTitle">7) Approvals/compliance/technical complexity</p>
-        <div class="qOptions" data-q="e3">
+        <div class="qOptions">
           <label class="opt"><input type="radio" name="e3" value="2"> Routine approvals; no integration</label>
           <label class="opt"><input type="radio" name="e3" value="1"> Some reviews or light integration</label>
           <label class="opt"><input type="radio" name="e3" value="0"> Heavy compliance or meaningful integration/workflow change</label>
@@ -401,7 +473,6 @@
   </dialog>
 
   <script>
-    // ---------- Helpers ----------
     const $ = (id) => document.getElementById(id);
 
     function toNumber(val) {
@@ -411,22 +482,30 @@
       const n = Number(cleaned);
       return Number.isFinite(n) ? n : null;
     }
-    function fmtMoney(n) {
-      if (n === null || n === undefined || !Number.isFinite(n)) return "";
-      return n.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
-    }
-    function fmtPct(n) {
-      if (n === null || n === undefined || !Number.isFinite(n)) return "";
-      return (n * 100).toFixed(1) + "%";
-    }
+
     function clampInt(n, min, max) {
       n = Math.round(Number(n));
       if (!Number.isFinite(n)) return null;
       return Math.max(min, Math.min(max, n));
     }
 
+    function fmtMoney(n) {
+      if (n === null || n === undefined || !Number.isFinite(n)) return "";
+      return n.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    }
+
+    function fmtPct(n) {
+      if (n === null || n === undefined || !Number.isFinite(n)) return "";
+      return (n * 100).toFixed(1) + "%";
+    }
+
+    function safeDate(d) {
+      if (!d) return "";
+      const s = String(d).trim();
+      return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : "";
+    }
+
     function impactFromPct(p) {
-      // p in fraction (0.18 == 18%)
       if (p === null || !Number.isFinite(p)) return null;
       const pct = p * 100;
       if (pct < 2) return 1;
@@ -445,15 +524,22 @@
       return `<span class="scoreBadge ${cls}">${s}</span>`;
     }
 
-    function safeDate(d) {
-      // Return YYYY-MM-DD or ""
-      if (!d) return "";
-      const s = String(d).trim();
-      return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : "";
+    function escapeHtml(s) {
+      return String(s ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    // ---------- State ----------
-    const STORAGE_KEY = "affinity_campaign_priority_v1";
+    function percentOfGoal(goal, incr) {
+      if (!Number.isFinite(goal) || goal <= 0) return null;
+      if (!Number.isFinite(incr)) return null;
+      return incr / goal;
+    }
+
+    const STORAGE_KEY = "affinity_campaign_priority_v2_responsive";
     let campaigns = [];
     let editingId = null;
 
@@ -483,11 +569,9 @@
     function getWeights() {
       let wi = toNumber($("wImpact").value);
       let we = toNumber($("wEffort").value);
-      // Defaults if blank
       if (wi === null) wi = 0.6;
       if (we === null) we = 0.4;
 
-      // Normalize if user enters values that don't sum to 1
       const sum = wi + we;
       if (sum > 0 && Math.abs(sum - 1) > 0.001) {
         wi = wi / sum;
@@ -506,13 +590,6 @@
       return (i * wi) + (e * we);
     }
 
-    function percentOfGoal(goal, incr) {
-      if (!Number.isFinite(goal) || goal <= 0) return null;
-      if (!Number.isFinite(incr)) return null;
-      return incr / goal;
-    }
-
-    // ---------- CRUD ----------
     function resetForm() {
       editingId = null;
       $("product").value = "";
@@ -589,7 +666,6 @@
       render();
     }
 
-    // ---------- Render ----------
     function render() {
       const tbody = $("tbl").querySelector("tbody");
       tbody.innerHTML = "";
@@ -606,13 +682,10 @@
 
       const filtered = computed.filter(c => {
         if (!query) return true;
-        const blob = [
-          c.product, c.campaign, c.desc, c.owner, c.deps
-        ].join(" ").toLowerCase();
+        const blob = [c.product, c.campaign, c.desc, c.owner, c.deps].join(" ").toLowerCase();
         return blob.includes(query);
       });
 
-      // Sort: priority desc, then impact desc, then launch asc (if present)
       filtered.sort((a,b) => {
         const ap = a._priority ?? -Infinity;
         const bp = b._priority ?? -Infinity;
@@ -634,22 +707,22 @@
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${escapeHtml(c.product)}</td>
-          <td>
+          <td data-label="Product">${escapeHtml(c.product)}</td>
+          <td data-label="Campaign">
             <div style="font-weight:650;">${escapeHtml(c.campaign)}</div>
             <div class="small">${escapeHtml(c.deps || "")}</div>
           </td>
-          <td class="small">${escapeHtml(descBlock || "")}</td>
-          <td class="num">${c._goalN === null ? "" : fmtMoney(c._goalN)}</td>
-          <td class="num">${c._incrN === null ? "" : fmtMoney(c._incrN)}</td>
-          <td class="num">${pctTxt}</td>
-          <td class="num">${badge(c.impact)}</td>
-          <td class="num">${badge(c.effort)}</td>
-          <td class="num"><strong>${escapeHtml(prTxt)}</strong></td>
-          <td>${escapeHtml(c.owner || "")}</td>
-          <td>${escapeHtml(c.launch || "")}</td>
-          <td>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <td data-label="Description / Notes" class="small">${escapeHtml(descBlock || "")}</td>
+          <td data-label="Goal ($)" class="num">${c._goalN === null ? "" : fmtMoney(c._goalN)}</td>
+          <td data-label="Incremental ($)" class="num">${c._incrN === null ? "" : fmtMoney(c._incrN)}</td>
+          <td data-label="% of Goal" class="num">${pctTxt}</td>
+          <td data-label="Impact" class="num">${badge(c.impact)}</td>
+          <td data-label="Effort" class="num">${badge(c.effort)}</td>
+          <td data-label="Priority" class="num"><strong>${escapeHtml(prTxt)}</strong></td>
+          <td data-label="Owner">${escapeHtml(c.owner || "")}</td>
+          <td data-label="Launch">${escapeHtml(c.launch || "")}</td>
+          <td data-label="Actions">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
               <button class="ghost" data-act="edit" data-id="${c.id}" style="width:auto; padding:8px 10px;">Edit</button>
               <button class="ghost" data-act="suggest" data-id="${c.id}" style="width:auto; padding:8px 10px;">Suggest Impact</button>
               <button class="danger" data-act="del" data-id="${c.id}" style="width:auto; padding:8px 10px;">Delete</button>
@@ -659,17 +732,19 @@
         tbody.appendChild(tr);
       }
 
-      // wire table actions
       tbody.querySelectorAll("button[data-act]").forEach(btn => {
         btn.addEventListener("click", () => {
           const act = btn.getAttribute("data-act");
           const id = btn.getAttribute("data-id");
           const item = campaigns.find(x => x.id === id);
           if (!item) return;
+
           if (act === "edit") fillForm(item);
+
           if (act === "del") {
             if (confirm("Delete this campaign?")) removeById(id);
           }
+
           if (act === "suggest") {
             const goal = toNumber(item.goal);
             const incr = toNumber(item.incr);
@@ -690,16 +765,6 @@
       saveState();
     }
 
-    function escapeHtml(s) {
-      return String(s ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    // ---------- CSV Export ----------
     function exportCSV() {
       const { wi, we } = getWeights();
 
@@ -744,9 +809,7 @@
 
       const csv = [header, ...rows].map(r => r.map(cell => {
         const s = String(cell ?? "");
-        if (s.includes(",") || s.includes('"') || s.includes("\n")) {
-          return `"${s.replaceAll('"', '""')}"`;
-        }
+        if (s.includes(",") || s.includes('"') || s.includes("\n")) return `"${s.replaceAll('"', '""')}"`;
         return s;
       }).join(",")).join("\n");
 
@@ -761,21 +824,7 @@
       URL.revokeObjectURL(url);
     }
 
-    // ---------- Quiz logic ----------
-    function quizScorePreview() {
-      const impactPoints = sumChecked(["i1","i2","i3","i4"]);
-      const effortPoints = sumChecked(["e1","e2","e3"]);
-
-      const impactScore = mapImpactPoints(impactPoints);
-      const effortScore = mapEffortPoints(effortPoints);
-
-      const preview = $("quizPreview");
-      preview.innerHTML = `
-        <div><strong>Impact points:</strong> ${impactPoints} → <strong>Impact Score:</strong> ${impactScore ?? "—"}</div>
-        <div style="margin-top:6px;"><strong>Effort points:</strong> ${effortPoints} → <strong>Effort Score:</strong> ${effortScore ?? "—"} <span class="small">(5 = low effort)</span></div>
-      `;
-    }
-
+    // Quiz logic
     function sumChecked(names) {
       let sum = 0;
       let any = false;
@@ -787,9 +836,7 @@
     }
 
     function mapImpactPoints(p) {
-      // With 4 questions, max is 8. We keep mapping consistent by scaling to 10.
-      // Scale: p * (10/8)
-      const scaled = p * 1.25;
+      const scaled = p * 1.25; // 4 questions, max 8 -> scale to 10
       if (scaled <= 2) return 1;
       if (scaled <= 4) return 2;
       if (scaled <= 6) return 3;
@@ -798,13 +845,24 @@
     }
 
     function mapEffortPoints(p) {
-      // 3 questions, max 6. Scale to 10.
-      const scaled = p * (10/6);
+      const scaled = p * (10/6); // 3 questions, max 6 -> scale to 10
       if (scaled <= 1) return 1;
       if (scaled <= 3) return 2;
       if (scaled <= 5) return 3;
       if (scaled <= 7) return 4;
       return 5;
+    }
+
+    function quizScorePreview() {
+      const impactPoints = sumChecked(["i1","i2","i3","i4"]);
+      const effortPoints = sumChecked(["e1","e2","e3"]);
+      const impactScore = mapImpactPoints(impactPoints);
+      const effortScore = mapEffortPoints(effortPoints);
+
+      $("quizPreview").innerHTML = `
+        <div><strong>Impact points:</strong> ${impactPoints} → <strong>Impact Score:</strong> ${impactScore}</div>
+        <div style="margin-top:6px;"><strong>Effort points:</strong> ${effortPoints} → <strong>Effort Score:</strong> ${effortScore} <span class="small">(5 = low effort)</span></div>
+      `;
     }
 
     function resetQuiz() {
@@ -815,17 +873,15 @@
     function applyQuizToForm() {
       const impactPoints = sumChecked(["i1","i2","i3","i4"]);
       const effortPoints = sumChecked(["e1","e2","e3"]);
-      const impactScore = mapImpactPoints(impactPoints);
-      const effortScore = mapEffortPoints(effortPoints);
-
-      $("impact").value = String(impactScore);
-      $("effort").value = String(effortScore);
+      $("impact").value = String(mapImpactPoints(impactPoints));
+      $("effort").value = String(mapEffortPoints(effortPoints));
       $("quiz").close();
     }
 
-    // ---------- Buttons ----------
+    // Wire up UI
     $("saveBtn").addEventListener("click", upsertFromForm);
     $("resetFormBtn").addEventListener("click", resetForm);
+    $("exportBtn").addEventListener("click", exportCSV);
 
     $("preset").addEventListener("change", () => {
       const [wi, we] = $("preset").value.split(",").map(Number);
@@ -838,8 +894,6 @@
     $("wImpact").addEventListener("change", () => { saveState(); render(); });
     $("wEffort").addEventListener("change", () => { saveState(); render(); });
     $("search").addEventListener("input", render);
-
-    $("exportBtn").addEventListener("click", exportCSV);
 
     $("clearAllBtn").addEventListener("click", () => {
       if (!confirm("Clear all saved campaigns and reset?")) return;
@@ -903,11 +957,9 @@
     $("closeQuizBtn").addEventListener("click", () => $("quiz").close());
     $("quizResetBtn").addEventListener("click", resetQuiz);
     $("quizApplyBtn").addEventListener("click", applyQuizToForm);
-    document.querySelectorAll('#quiz input[type="radio"]').forEach(r => {
-      r.addEventListener("change", quizScorePreview);
-    });
+    document.querySelectorAll('#quiz input[type="radio"]').forEach(r => r.addEventListener("change", quizScorePreview));
 
-    // ---------- Init ----------
+    // Init
     loadState();
     render();
   </script>
