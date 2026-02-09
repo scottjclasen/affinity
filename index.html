@@ -5,229 +5,266 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Affinity Campaign Prioritization Matrix</title>
   <style>
-    :root {
-      --bg: #0b0f19;
-      --card: #121a2a;
-      --card2: #0f1626;
-      --text: #e8eefc;
-      --muted: #a9b7d0;
-      --line: rgba(255,255,255,0.12);
-      --shadow: 0 10px 30px rgba(0,0,0,0.35);
-      --radius: 16px;
+    :root{
+      --bg:#0b0f19;
+      --card:#121a2a;
+      --card2:#0f1626;
+      --text:#e8eefc;
+      --muted:#a9b7d0;
+      --line:rgba(255,255,255,.12);
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 20% -10%, rgba(122,162,255,0.18), transparent 55%),
-                  radial-gradient(1200px 800px at 90% 10%, rgba(107,255,176,0.10), transparent 50%),
-                  var(--bg);
-      color: var(--text);
-      line-height: 1.35;
-    }
-    header {
-      padding: 24px 16px 10px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    h1 { margin: 0 0 6px; font-size: clamp(18px, 2.2vw, 26px); letter-spacing: 0.2px; }
-    .sub { color: var(--muted); font-size: 14px; margin: 0; }
-
-    main { max-width: 1200px; margin: 0 auto; padding: 12px 16px 26px; display: grid; gap: 14px; }
-
-    /* Responsive grid: single column on small screens; two columns on wider */
-    .grid {
-      display: grid;
-      gap: 14px;
-      grid-template-columns: 1fr;
-    }
-    @media (min-width: 800px) {
-      .grid { grid-template-columns: 380px 1fr; }
-    }
-    @media (min-width: 1200px) {
-      .grid { grid-template-columns: 420px 1fr; }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 800px at 20% -10%, rgba(122,162,255,.18), transparent 55%),
+        radial-gradient(1200px 800px at 90% 10%, rgba(107,255,176,.10), transparent 50%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.35;
     }
 
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 65%), var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px;
-      min-width: 0; /* important for responsive overflow handling */
-    }
-    .card h2 {
-      font-size: 13px;
-      margin: 0 0 10px;
-      color: #dbe6ff;
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
+    /* ✅ FULL-WIDTH LAYOUT (fixes width restriction) */
+    header, main{
+      width:100%;
+      max-width:none;                 /* key: no cap */
+      margin:0 auto;
+      padding-left:clamp(12px, 2vw, 28px);
+      padding-right:clamp(12px, 2vw, 28px);
     }
 
-    /* Form rows become 2/3 cols on wide screens, stack on small */
-    .row { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .row3 { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    @media (min-width: 520px) {
-      .row { grid-template-columns: 1fr 1fr; }
-      .row3 { grid-template-columns: 1fr 1fr 1fr; }
+    header{ padding-top:24px; padding-bottom:10px; }
+    h1{ margin:0 0 6px; font-size:clamp(18px,2.0vw,28px); letter-spacing:.2px; }
+    .sub{ color:var(--muted); font-size:14px; margin:0; }
+
+    main{
+      padding-top:12px;
+      padding-bottom:26px;
+      display:grid;
+      gap:14px;
     }
 
-    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-    input, select, textarea, button {
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: var(--card2);
-      color: var(--text);
-      padding: 10px 10px;
-      font-size: 14px;
-      outline: none;
+    /* ✅ Two-column app grid that can grow on big screens */
+    .grid{
+      display:grid;
+      gap:14px;
+      grid-template-columns: 1fr; /* mobile */
+      align-items:start;
     }
-    textarea { min-height: 68px; resize: vertical; }
-    input::placeholder, textarea::placeholder { color: rgba(169,183,208,0.55); }
-    input:focus, select:focus, textarea:focus { border-color: rgba(122,162,255,0.55); box-shadow: 0 0 0 3px rgba(122,162,255,0.12); }
-
-    .btnRow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-    button { cursor: pointer; transition: transform 0.05s ease, border-color 0.2s ease; }
-    button:active { transform: translateY(1px); }
-    .primary { background: rgba(122,162,255,0.16); border-color: rgba(122,162,255,0.45); }
-    .ghost { background: transparent; }
-    .danger { background: rgba(255,107,107,0.12); border-color: rgba(255,107,107,0.45); }
-
-    .pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 8px 10px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.02);
-      color: var(--muted);
-      font-size: 12px;
-      margin: 6px 6px 0 0;
-    }
-    .pill strong { color: var(--text); font-weight: 600; }
-
-    .mutedBlock {
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px dashed rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.02);
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .small { font-size: 12px; color: var(--muted); }
-    .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
-
-    /* Top controls should wrap nicely */
-    .rightTop {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .weights { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .weights > div { width: 160px; }
-    .searchBar { width: 280px; max-width: 100%; }
-
-    @media (max-width: 700px) {
-      .rightTop { flex-direction: column; align-items: stretch; }
-      .weights { width: 100%; }
-      .weights > div { width: 100%; }
-      .searchBar { width: 100%; }
-    }
-
-    /* Table wrapper: allow horizontal scroll if needed on mid screens */
-    .tableWrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--line); }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    th {
-      position: sticky;
-      top: 0;
-      background: #0e1526;
-      color: #dbe6ff;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      white-space: nowrap;
-    }
-    td { font-size: 13px; color: rgba(232,238,252,0.92); }
-    tr:hover td { background: rgba(255,255,255,0.02); }
-
-    .num { text-align: right; white-space: nowrap; }
-
-    .scoreBadge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 26px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      font-weight: 700;
-      background: rgba(255,255,255,0.02);
-    }
-    .scoreGood { border-color: rgba(107,255,176,0.35); background: rgba(107,255,176,0.08); }
-    .scoreWarn { border-color: rgba(255,207,90,0.35); background: rgba(255,207,90,0.08); }
-    .scoreBad  { border-color: rgba(255,107,107,0.35); background: rgba(255,107,107,0.08); }
-
-    /* Mobile: table becomes cards */
-    @media (max-width: 900px) {
-      table, thead, tbody, th, tr, td { display: block; width: 100%; }
-      thead { display: none; }
-
-      tr {
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        margin: 10px;
-        padding: 10px;
-        background: rgba(255,255,255,0.02);
+    @media (min-width: 900px){
+      .grid{
+        grid-template-columns: minmax(340px, 420px) minmax(0, 1fr); /* right side can expand */
       }
-
-      td {
-        border: none;
-        padding: 6px 0;
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-      }
-
-      td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        color: var(--muted);
-        flex: 1;
-        text-align: left;
-      }
-
-      td > * {
-        flex: 1;
-        text-align: right;
-      }
-
-      .num { text-align: right; white-space: normal; }
     }
 
-    /* Modal */
-    dialog {
-      width: min(720px, calc(100vw - 22px));
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: var(--card);
-      color: var(--text);
-      box-shadow: var(--shadow);
-      padding: 0;
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 65%), var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+      min-width:0; /* critical so right column doesn't clip */
     }
-    dialog::backdrop { background: rgba(0,0,0,0.6); }
-    .modalHead { padding: 14px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; align-items: center; }
-    .modalHead h3 { margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.4px; color: #dbe6ff; }
-    .modalBody { padding: 14px; display: grid; gap: 12px; }
-    .q { padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,0.02); }
-    .qTitle { font-size: 13px; margin: 0 0 8px; color: rgba(232,238,252,0.95); }
-    .qOptions { display: grid; gap: 8px; }
-    .opt { display: flex; gap: 10px; align-items: flex-start; }
-    .opt input { width: auto; margin-top: 2px; }
-    .modalFoot { padding: 14px; border-top: 1px solid var(--line); display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+    .card h2{
+      font-size:13px;
+      margin:0 0 10px;
+      color:#dbe6ff;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+    }
+
+    /* form layout */
+    .row{ display:grid; grid-template-columns:1fr; gap:10px; }
+    .row3{ display:grid; grid-template-columns:1fr; gap:10px; }
+    @media (min-width: 520px){
+      .row{ grid-template-columns:1fr 1fr; }
+      .row3{ grid-template-columns:1fr 1fr 1fr; }
+    }
+
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    input, select, textarea, button{
+      width:100%;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:var(--card2);
+      color:var(--text);
+      padding:10px 10px;
+      font-size:14px;
+      outline:none;
+    }
+    textarea{ min-height:68px; resize:vertical; }
+    input::placeholder, textarea::placeholder{ color:rgba(169,183,208,.55); }
+    input:focus, select:focus, textarea:focus{
+      border-color:rgba(122,162,255,.55);
+      box-shadow:0 0 0 3px rgba(122,162,255,.12);
+    }
+
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    button{ cursor:pointer; transition:transform .05s ease,border-color .2s ease; }
+    button:active{ transform:translateY(1px); }
+    .primary{ background:rgba(122,162,255,.16); border-color:rgba(122,162,255,.45); }
+    .ghost{ background:transparent; }
+    .danger{ background:rgba(255,107,107,.12); border-color:rgba(255,107,107,.45); }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(255,255,255,.02);
+      color:var(--muted);
+      font-size:12px;
+      margin:6px 6px 0 0;
+    }
+    .pill strong{ color:var(--text); font-weight:600; }
+
+    .mutedBlock{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px dashed rgba(255,255,255,.18);
+      background:rgba(255,255,255,.02);
+      color:var(--muted);
+      font-size:13px;
+    }
+    .small{ font-size:12px; color:var(--muted); }
+    .hint{ color:var(--muted); font-size:12px; margin-top:6px; }
+
+    /* top controls */
+    .rightTop{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .weights{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .weights > div{ width:160px; }
+    .searchBar{ width:320px; max-width:100%; }
+    @media (max-width: 700px){
+      .rightTop{ flex-direction:column; align-items:stretch; }
+      .weights{ width:100%; }
+      .weights > div{ width:100%; }
+      .searchBar{ width:100%; }
+    }
+
+    /* ✅ Table: allow horizontal scroll on any screen if needed (prevents cutoff) */
+    .tableWrap{
+      overflow-x:auto;
+      border-radius:14px;
+      border:1px solid var(--line);
+      max-width:100%;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      /* key: table can be wider than container; container scrolls instead of clipping */
+      min-width: 1100px;
+    }
+    th, td{ padding:10px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+    th{
+      position:sticky;
+      top:0;
+      background:#0e1526;
+      color:#dbe6ff;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+      white-space:nowrap;
+      z-index:1;
+    }
+    td{ font-size:13px; color:rgba(232,238,252,.92); }
+    tr:hover td{ background:rgba(255,255,255,.02); }
+    .num{ text-align:right; white-space:nowrap; }
+
+    .scoreBadge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:26px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      font-weight:700;
+      background:rgba(255,255,255,.02);
+    }
+    .scoreGood{ border-color:rgba(107,255,176,.35); background:rgba(107,255,176,.08); }
+    .scoreWarn{ border-color:rgba(255,207,90,.35); background:rgba(255,207,90,.08); }
+    .scoreBad { border-color:rgba(255,107,107,.35); background:rgba(255,107,107,.08); }
+
+    /* Mobile: table becomes cards (no horizontal scroll needed) */
+    @media (max-width: 900px){
+      table, thead, tbody, th, tr, td{ display:block; width:100%; }
+      thead{ display:none; }
+      table{ min-width:0; } /* no forced width in card mode */
+      tr{
+        border:1px solid var(--line);
+        border-radius:14px;
+        margin:10px;
+        padding:10px;
+        background:rgba(255,255,255,.02);
+      }
+      td{
+        border:none;
+        padding:6px 0;
+        display:flex;
+        justify-content:space-between;
+        gap:10px;
+      }
+      td::before{
+        content:attr(data-label);
+        font-weight:600;
+        color:var(--muted);
+        flex:1;
+        text-align:left;
+      }
+      td > *{ flex:1; text-align:right; }
+      .num{ text-align:right; white-space:normal; }
+    }
+
+    /* modal */
+    dialog{
+      width:min(720px, calc(100vw - 22px));
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:var(--card);
+      color:var(--text);
+      box-shadow:var(--shadow);
+      padding:0;
+    }
+    dialog::backdrop{ background:rgba(0,0,0,.6); }
+    .modalHead{
+      padding:14px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+    .modalHead h3{
+      margin:0;
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+      color:#dbe6ff;
+    }
+    .modalBody{ padding:14px; display:grid; gap:12px; }
+    .q{ padding:12px; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.02); }
+    .qTitle{ font-size:13px; margin:0 0 8px; color:rgba(232,238,252,.95); }
+    .qOptions{ display:grid; gap:8px; }
+    .opt{ display:flex; gap:10px; align-items:flex-start; }
+    .opt input{ width:auto; margin-top:2px; }
+    .modalFoot{
+      padding:14px;
+      border-top:1px solid var(--line);
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
   </style>
 </head>
 <body>
@@ -236,153 +273,155 @@
     <p class="sub">Enter campaigns, assign Impact (1–5) and Effort (1–5; 5 = low effort), and sort by weighted Priority Score.</p>
   </header>
 
-  <main class="grid">
-    <!-- Left: Form -->
-    <section class="card">
-      <h2>Add / Edit Campaign</h2>
+  <main>
+    <div class="grid">
+      <!-- Left: Form -->
+      <section class="card">
+        <h2>Add / Edit Campaign</h2>
 
-      <div class="row">
-        <div>
-          <label>Product</label>
-          <input id="product" placeholder="e.g., Affinity Insights" />
-        </div>
-        <div>
-          <label>Owner (optional)</label>
-          <input id="owner" placeholder="e.g., Robin" />
-        </div>
-      </div>
-
-      <div style="margin-top:10px;">
-        <label>Campaign / Strategy</label>
-        <input id="campaign" placeholder="Short name (e.g., Lawyerist webinar → consult CTA)" />
-      </div>
-
-      <div style="margin-top:10px;">
-        <label>Description (optional)</label>
-        <textarea id="desc" placeholder="Brief description, target audience, offer, channel mix…"></textarea>
-      </div>
-
-      <div class="row" style="margin-top:10px;">
-        <div>
-          <label>Product Revenue Goal ($)</label>
-          <input id="goal" inputmode="decimal" placeholder="e.g., 500000" />
-          <div class="hint">Used for % of goal mapping if you enter an incremental revenue estimate.</div>
-        </div>
-        <div>
-          <label>Est. Incremental Revenue ($) (optional)</label>
-          <input id="incr" inputmode="decimal" placeholder="e.g., 90000" />
-          <div class="hint">If provided, the app can auto-suggest an Impact Score using % of goal.</div>
-        </div>
-      </div>
-
-      <div class="row3" style="margin-top:10px;">
-        <div>
-          <label>Impact Score (1–5)</label>
-          <select id="impact">
-            <option value="">(choose)</option>
-            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-          </select>
-          <div class="hint">1 = negligible impact; 5 = very high impact.</div>
-        </div>
-        <div>
-          <label>Effort Score (1–5; 5=low effort)</label>
-          <select id="effort">
-            <option value="">(choose)</option>
-            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-          </select>
-          <div class="hint">5 = XS / very low effort; 1 = XL / very high effort.</div>
-        </div>
-        <div>
-          <label>Target Launch (optional)</label>
-          <input id="launch" type="date" />
-        </div>
-      </div>
-
-      <div style="margin-top:10px;">
-        <label>Dependencies / Notes (optional)</label>
-        <input id="deps" placeholder="Approvals, cross-functional needs, risks, low-confidence notes…" />
-      </div>
-
-      <div class="btnRow">
-        <button class="primary" id="saveBtn">Add campaign</button>
-        <button class="ghost" id="quizBtn" type="button">Use quiz to score</button>
-        <button class="ghost" id="autoImpactBtn" type="button">Auto-suggest Impact from % of goal</button>
-        <button class="danger" id="resetFormBtn" type="button">Clear form</button>
-      </div>
-
-      <div style="margin-top:10px;" class="mutedBlock">
-        <div><strong>Default weights:</strong> Impact 60% / Effort 40%.</div>
-        <div class="small" style="margin-top:6px;">
-          Priority Score = (Impact × Impact Weight) + (Effort × Effort Weight). Higher = higher priority.
-        </div>
-      </div>
-
-      <div style="margin-top:12px;">
-        <span class="pill"><strong>Impact % mapping:</strong> &lt;2%=1 • 2–5%=2 • 5–10%=3 • 10–20%=4 • &gt;20%=5</span>
-        <span class="pill"><strong>Effort crosswalk:</strong> XS=5 • S=4 • M=3 • L=2 • XL=1</span>
-      </div>
-    </section>
-
-    <!-- Right: Table -->
-    <section class="card">
-      <div class="rightTop">
-        <div class="weights">
+        <div class="row">
           <div>
-            <label>Impact Weight</label>
-            <input id="wImpact" inputmode="decimal" value="0.6" />
+            <label>Product</label>
+            <input id="product" placeholder="e.g., Affinity Insights" />
           </div>
           <div>
-            <label>Effort Weight</label>
-            <input id="wEffort" inputmode="decimal" value="0.4" />
+            <label>Owner (optional)</label>
+            <input id="owner" placeholder="e.g., Robin" />
           </div>
-          <div style="width: 220px;">
-            <label>Weight Presets</label>
-            <select id="preset">
-              <option value="0.6,0.4">Default (0.6 / 0.4)</option>
-              <option value="0.7,0.3">Aggressive (0.7 / 0.3)</option>
-              <option value="0.5,0.5">Balanced (0.5 / 0.5)</option>
+        </div>
+
+        <div style="margin-top:10px;">
+          <label>Campaign / Strategy</label>
+          <input id="campaign" placeholder="Short name (e.g., Lawyerist webinar → consult CTA)" />
+        </div>
+
+        <div style="margin-top:10px;">
+          <label>Description (optional)</label>
+          <textarea id="desc" placeholder="Brief description, target audience, offer, channel mix…"></textarea>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <div>
+            <label>Product Revenue Goal ($)</label>
+            <input id="goal" inputmode="decimal" placeholder="e.g., 500000" />
+            <div class="hint">Used for % of goal mapping if you enter an incremental revenue estimate.</div>
+          </div>
+          <div>
+            <label>Est. Incremental Revenue ($) (optional)</label>
+            <input id="incr" inputmode="decimal" placeholder="e.g., 90000" />
+            <div class="hint">If provided, the app can auto-suggest an Impact Score using % of goal.</div>
+          </div>
+        </div>
+
+        <div class="row3" style="margin-top:10px;">
+          <div>
+            <label>Impact Score (1–5)</label>
+            <select id="impact">
+              <option value="">(choose)</option>
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
             </select>
+            <div class="hint">1 = negligible impact; 5 = very high impact.</div>
+          </div>
+          <div>
+            <label>Effort Score (1–5; 5=low effort)</label>
+            <select id="effort">
+              <option value="">(choose)</option>
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+            <div class="hint">5 = XS / very low effort; 1 = XL / very high effort.</div>
+          </div>
+          <div>
+            <label>Target Launch (optional)</label>
+            <input id="launch" type="date" />
           </div>
         </div>
 
-        <div class="searchBar">
-          <label>Search</label>
-          <input id="search" placeholder="Filter by product, campaign, owner…" />
+        <div style="margin-top:10px;">
+          <label>Dependencies / Notes (optional)</label>
+          <input id="deps" placeholder="Approvals, cross-functional needs, risks, low-confidence notes…" />
         </div>
-      </div>
 
-      <div class="btnRow" style="margin-top:0;">
-        <button class="ghost" id="exportBtn" type="button">Export CSV</button>
-        <button class="ghost" id="loadSamplesBtn" type="button">Load sample rows</button>
-        <button class="danger" id="clearAllBtn" type="button">Clear all data</button>
-      </div>
+        <div class="btnRow">
+          <button class="primary" id="saveBtn">Add campaign</button>
+          <button class="ghost" id="quizBtn" type="button">Use quiz to score</button>
+          <button class="ghost" id="autoImpactBtn" type="button">Auto-suggest Impact from % of goal</button>
+          <button class="danger" id="resetFormBtn" type="button">Clear form</button>
+        </div>
 
-      <div class="tableWrap" style="margin-top:12px;">
-        <table id="tbl">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Campaign</th>
-              <th>Description / Notes</th>
-              <th class="num">Goal ($)</th>
-              <th class="num">Incremental ($)</th>
-              <th class="num">% of Goal</th>
-              <th class="num">Impact</th>
-              <th class="num">Effort</th>
-              <th class="num">Priority</th>
-              <th>Owner</th>
-              <th>Launch</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+        <div style="margin-top:10px;" class="mutedBlock">
+          <div><strong>Default weights:</strong> Impact 60% / Effort 40%.</div>
+          <div class="small" style="margin-top:6px;">
+            Priority Score = (Impact × Impact Weight) + (Effort × Effort Weight). Higher = higher priority.
+          </div>
+        </div>
 
-      <div class="mutedBlock" style="margin-top:12px;">
-        <div><strong>Tie-breakers:</strong> If Priority is equal, sort by higher Impact Score, then earlier Launch date (if filled), then lower cash cost.</div>
-      </div>
-    </section>
+        <div style="margin-top:12px;">
+          <span class="pill"><strong>Impact % mapping:</strong> &lt;2%=1 • 2–5%=2 • 5–10%=3 • 10–20%=4 • &gt;20%=5</span>
+          <span class="pill"><strong>Effort crosswalk:</strong> XS=5 • S=4 • M=3 • L=2 • XL=1</span>
+        </div>
+      </section>
+
+      <!-- Right: Table -->
+      <section class="card">
+        <div class="rightTop">
+          <div class="weights">
+            <div>
+              <label>Impact Weight</label>
+              <input id="wImpact" inputmode="decimal" value="0.6" />
+            </div>
+            <div>
+              <label>Effort Weight</label>
+              <input id="wEffort" inputmode="decimal" value="0.4" />
+            </div>
+            <div style="width: 220px;">
+              <label>Weight Presets</label>
+              <select id="preset">
+                <option value="0.6,0.4">Default (0.6 / 0.4)</option>
+                <option value="0.7,0.3">Aggressive (0.7 / 0.3)</option>
+                <option value="0.5,0.5">Balanced (0.5 / 0.5)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="searchBar">
+            <label>Search</label>
+            <input id="search" placeholder="Filter by product, campaign, owner…" />
+          </div>
+        </div>
+
+        <div class="btnRow" style="margin-top:0;">
+          <button class="ghost" id="exportBtn" type="button">Export CSV</button>
+          <button class="ghost" id="loadSamplesBtn" type="button">Load sample rows</button>
+          <button class="danger" id="clearAllBtn" type="button">Clear all data</button>
+        </div>
+
+        <div class="tableWrap" style="margin-top:12px;">
+          <table id="tbl">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Campaign</th>
+                <th>Description / Notes</th>
+                <th class="num">Goal ($)</th>
+                <th class="num">Incremental ($)</th>
+                <th class="num">% of Goal</th>
+                <th class="num">Impact</th>
+                <th class="num">Effort</th>
+                <th class="num">Priority</th>
+                <th>Owner</th>
+                <th>Launch</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="mutedBlock" style="margin-top:12px;">
+          <div><strong>Tie-breakers:</strong> If Priority is equal, sort by higher Impact Score, then earlier Launch date (if filled), then lower cash cost.</div>
+        </div>
+      </section>
+    </div>
   </main>
 
   <!-- Quiz modal -->
@@ -475,47 +514,41 @@
   <script>
     const $ = (id) => document.getElementById(id);
 
-    function toNumber(val) {
+    function toNumber(val){
       if (val === null || val === undefined) return null;
-      const cleaned = String(val).replace(/[$, ]/g, "").trim();
+      const cleaned = String(val).replace(/[$, ]/g,"").trim();
       if (cleaned === "") return null;
       const n = Number(cleaned);
       return Number.isFinite(n) ? n : null;
     }
-
-    function clampInt(n, min, max) {
+    function clampInt(n, min, max){
       n = Math.round(Number(n));
       if (!Number.isFinite(n)) return null;
       return Math.max(min, Math.min(max, n));
     }
-
-    function fmtMoney(n) {
+    function fmtMoney(n){
       if (n === null || n === undefined || !Number.isFinite(n)) return "";
-      return n.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+      return n.toLocaleString(undefined, { style:"currency", currency:"USD", maximumFractionDigits:0 });
     }
-
-    function fmtPct(n) {
+    function fmtPct(n){
       if (n === null || n === undefined || !Number.isFinite(n)) return "";
-      return (n * 100).toFixed(1) + "%";
+      return (n*100).toFixed(1) + "%";
     }
-
-    function safeDate(d) {
+    function safeDate(d){
       if (!d) return "";
       const s = String(d).trim();
       return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : "";
     }
-
-    function impactFromPct(p) {
+    function impactFromPct(p){
       if (p === null || !Number.isFinite(p)) return null;
-      const pct = p * 100;
+      const pct = p*100;
       if (pct < 2) return 1;
       if (pct < 5) return 2;
       if (pct < 10) return 3;
       if (pct < 20) return 4;
       return 5;
     }
-
-    function badge(score) {
+    function badge(score){
       const s = Number(score);
       if (!Number.isFinite(s)) return `<span class="scoreBadge">–</span>`;
       let cls = "scoreWarn";
@@ -523,27 +556,25 @@
       if (s <= 2) cls = "scoreBad";
       return `<span class="scoreBadge ${cls}">${s}</span>`;
     }
-
-    function escapeHtml(s) {
+    function escapeHtml(s){
       return String(s ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
     }
-
-    function percentOfGoal(goal, incr) {
+    function percentOfGoal(goal, incr){
       if (!Number.isFinite(goal) || goal <= 0) return null;
       if (!Number.isFinite(incr)) return null;
       return incr / goal;
     }
 
-    const STORAGE_KEY = "affinity_campaign_priority_v2_responsive";
+    const STORAGE_KEY = "affinity_campaign_priority_v3_fullwidth";
     let campaigns = [];
     let editingId = null;
 
-    function saveState() {
+    function saveState(){
       const weights = {
         wImpact: toNumber($("wImpact").value) ?? 0.6,
         wEffort: toNumber($("wEffort").value) ?? 0.4
@@ -551,29 +582,29 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ campaigns, weights }));
     }
 
-    function loadState() {
+    function loadState(){
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
-      try {
+      try{
         const parsed = JSON.parse(raw);
         campaigns = Array.isArray(parsed.campaigns) ? parsed.campaigns : [];
-        if (parsed.weights) {
+        if (parsed.weights){
           $("wImpact").value = (parsed.weights.wImpact ?? 0.6);
           $("wEffort").value = (parsed.weights.wEffort ?? 0.4);
         }
-      } catch (e) {
+      }catch(e){
         console.warn("Failed to load saved state:", e);
       }
     }
 
-    function getWeights() {
+    function getWeights(){
       let wi = toNumber($("wImpact").value);
       let we = toNumber($("wEffort").value);
       if (wi === null) wi = 0.6;
       if (we === null) we = 0.4;
 
       const sum = wi + we;
-      if (sum > 0 && Math.abs(sum - 1) > 0.001) {
+      if (sum > 0 && Math.abs(sum - 1) > 0.001){
         wi = wi / sum;
         we = we / sum;
         $("wImpact").value = wi.toFixed(3);
@@ -582,7 +613,7 @@
       return { wi, we };
     }
 
-    function computePriority(impactScore, effortScore) {
+    function computePriority(impactScore, effortScore){
       const { wi, we } = getWeights();
       const i = toNumber(impactScore);
       const e = toNumber(effortScore);
@@ -590,7 +621,7 @@
       return (i * wi) + (e * we);
     }
 
-    function resetForm() {
+    function resetForm(){
       editingId = null;
       $("product").value = "";
       $("owner").value = "";
@@ -605,7 +636,7 @@
       $("saveBtn").textContent = "Add campaign";
     }
 
-    function fillForm(item) {
+    function fillForm(item){
       editingId = item.id;
       $("product").value = item.product ?? "";
       $("owner").value = item.owner ?? "";
@@ -621,10 +652,10 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function upsertFromForm() {
+    function upsertFromForm(){
       const product = $("product").value.trim();
       const campaign = $("campaign").value.trim();
-      if (!product || !campaign) {
+      if (!product || !campaign){
         alert("Please enter at least Product and Campaign.");
         return;
       }
@@ -649,7 +680,7 @@
         createdAt: Date.now()
       };
 
-      if (editingId) {
+      if (editingId){
         campaigns = campaigns.map(c => c.id === editingId ? item : c);
       } else {
         campaigns.push(item);
@@ -660,13 +691,13 @@
       resetForm();
     }
 
-    function removeById(id) {
+    function removeById(id){
       campaigns = campaigns.filter(c => c.id !== id);
       saveState();
       render();
     }
 
-    function render() {
+    function render(){
       const tbody = $("tbl").querySelector("tbody");
       tbody.innerHTML = "";
 
@@ -700,7 +731,7 @@
         return ad - bd;
       });
 
-      for (const c of filtered) {
+      for (const c of filtered){
         const descBlock = [c.desc, c.deps].filter(Boolean).join(" — ");
         const pctTxt = c._pct === null ? "" : fmtPct(c._pct);
         const prTxt = c._priority === null ? "" : c._priority.toFixed(2);
@@ -740,17 +771,15 @@
           if (!item) return;
 
           if (act === "edit") fillForm(item);
-
-          if (act === "del") {
+          if (act === "del"){
             if (confirm("Delete this campaign?")) removeById(id);
           }
-
-          if (act === "suggest") {
+          if (act === "suggest"){
             const goal = toNumber(item.goal);
             const incr = toNumber(item.incr);
             const pct = percentOfGoal(goal, incr);
             const sug = impactFromPct(pct);
-            if (sug === null) {
+            if (sug === null){
               alert("To auto-suggest Impact, enter both Revenue Goal and Est. Incremental Revenue.");
               return;
             }
@@ -765,22 +794,12 @@
       saveState();
     }
 
-    function exportCSV() {
+    function exportCSV(){
       const { wi, we } = getWeights();
-
       const header = [
-        "Product",
-        "Campaign",
-        "Revenue Goal ($)",
-        "Est. Incremental Revenue ($ or % of Goal)",
-        "Impact Score (1–5)",
-        "Effort Score (1–5; 5=low effort)",
-        "Impact Weight",
-        "Effort Weight",
-        "Priority Score",
-        "Owner",
-        "Target Launch",
-        "Dependencies/Notes"
+        "Product","Campaign","Revenue Goal ($)","Est. Incremental Revenue ($ or % of Goal)",
+        "Impact Score (1–5)","Effort Score (1–5; 5=low effort)","Impact Weight","Effort Weight",
+        "Priority Score","Owner","Target Launch","Dependencies/Notes"
       ];
 
       const rows = campaigns.map(c => {
@@ -809,11 +828,11 @@
 
       const csv = [header, ...rows].map(r => r.map(cell => {
         const s = String(cell ?? "");
-        if (s.includes(",") || s.includes('"') || s.includes("\n")) return `"${s.replaceAll('"', '""')}"`;
+        if (s.includes(",") || s.includes('"') || s.includes("\n")) return `"${s.replaceAll('"','""')}"`;
         return s;
       }).join(",")).join("\n");
 
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -825,52 +844,44 @@
     }
 
     // Quiz logic
-    function sumChecked(names) {
+    function sumChecked(names){
       let sum = 0;
       let any = false;
-      for (const name of names) {
+      for (const name of names){
         const el = document.querySelector(`input[name="${name}"]:checked`);
-        if (el) { sum += Number(el.value); any = true; }
+        if (el){ sum += Number(el.value); any = true; }
       }
       return any ? sum : 0;
     }
-
-    function mapImpactPoints(p) {
-      const scaled = p * 1.25; // 4 questions, max 8 -> scale to 10
+    function mapImpactPoints(p){
+      const scaled = p * 1.25; // 4 q max 8 -> scale to 10
       if (scaled <= 2) return 1;
       if (scaled <= 4) return 2;
       if (scaled <= 6) return 3;
       if (scaled <= 8) return 4;
       return 5;
     }
-
-    function mapEffortPoints(p) {
-      const scaled = p * (10/6); // 3 questions, max 6 -> scale to 10
+    function mapEffortPoints(p){
+      const scaled = p * (10/6); // 3 q max 6 -> scale to 10
       if (scaled <= 1) return 1;
       if (scaled <= 3) return 2;
       if (scaled <= 5) return 3;
       if (scaled <= 7) return 4;
       return 5;
     }
-
-    function quizScorePreview() {
+    function quizScorePreview(){
       const impactPoints = sumChecked(["i1","i2","i3","i4"]);
       const effortPoints = sumChecked(["e1","e2","e3"]);
-      const impactScore = mapImpactPoints(impactPoints);
-      const effortScore = mapEffortPoints(effortPoints);
-
       $("quizPreview").innerHTML = `
-        <div><strong>Impact points:</strong> ${impactPoints} → <strong>Impact Score:</strong> ${impactScore}</div>
-        <div style="margin-top:6px;"><strong>Effort points:</strong> ${effortPoints} → <strong>Effort Score:</strong> ${effortScore} <span class="small">(5 = low effort)</span></div>
+        <div><strong>Impact points:</strong> ${impactPoints} → <strong>Impact Score:</strong> ${mapImpactPoints(impactPoints)}</div>
+        <div style="margin-top:6px;"><strong>Effort points:</strong> ${effortPoints} → <strong>Effort Score:</strong> ${mapEffortPoints(effortPoints)} <span class="small">(5 = low effort)</span></div>
       `;
     }
-
-    function resetQuiz() {
+    function resetQuiz(){
       document.querySelectorAll('#quiz input[type="radio"]').forEach(r => r.checked = false);
       $("quizPreview").innerHTML = `<div><strong>Preview:</strong> Answer questions to see the mapped scores.</div>`;
     }
-
-    function applyQuizToForm() {
+    function applyQuizToForm(){
       const impactPoints = sumChecked(["i1","i2","i3","i4"]);
       const effortPoints = sumChecked(["e1","e2","e3"]);
       $("impact").value = String(mapImpactPoints(impactPoints));
@@ -878,7 +889,7 @@
       $("quiz").close();
     }
 
-    // Wire up UI
+    // Events
     $("saveBtn").addEventListener("click", upsertFromForm);
     $("resetFormBtn").addEventListener("click", resetForm);
     $("exportBtn").addEventListener("click", exportCSV);
@@ -890,7 +901,6 @@
       saveState();
       render();
     });
-
     $("wImpact").addEventListener("change", () => { saveState(); render(); });
     $("wEffort").addEventListener("change", () => { saveState(); render(); });
     $("search").addEventListener("input", render);
@@ -944,7 +954,7 @@
       const incr = toNumber($("incr").value);
       const pct = percentOfGoal(goal, incr);
       const sug = impactFromPct(pct);
-      if (sug === null) {
+      if (sug === null){
         alert("Enter both Revenue Goal and Est. Incremental Revenue to auto-suggest Impact.");
         return;
       }
